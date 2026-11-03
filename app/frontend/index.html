@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Micro-Blogging Guestbook</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-wrapper">
+        <header>
+            <h1>📝 Community Guestbook</h1>
+            <p>Leave a note, share a thought, or just say hello!</p>
+        </header>
+
+        <main>
+            <form id="guestbookForm">
+                <div class="form-group">
+                    <label for="username">Your Name</label>
+                    <input type="text" id="username" placeholder="Type your name..." required>
+                </div>
+                <div class="form-group">
+                    <label for="message">Your Message</label>
+                    <textarea id="message" placeholder="Write your message here..." required></textarea>
+                </div>
+                <button type="submit" id="submitBtn">Sign Guestbook</button>
+            </form>
+
+            <section class="feed-section">
+                <h2>Recent Messages</h2>
+                <div id="postsFeed">Loading thoughts...</div>
+            </section>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

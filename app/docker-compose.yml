@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  # 1. Database service layer
+  mysql-db:
+    image: mysql:8.0
+    container_name: guestbook-mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: guestbook_db
+      MYSQL_ROOT_PASSWORD: root_secure_password
+      MYSQL_USER: guestbook_user
+      MYSQL_PASSWORD: user_secure_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - guestbook-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_secure_password"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      
+  # 2. Backend service layer
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: guestbook-backend
+    restart: always
+    environment:
+      PORT: 5000
+      DB_HOST: mysql-db
+      DB_PORT: 3306
+      DB_USER: guestbook_user
+      DB_PASSWORD: user_secure_password
+      DB_NAME: guestbook_db
+    ports:
+      - "5000:5000"
+    networks:
+      - guestbook-network
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+
+  # 3. Frontend service layer
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: guestbook-frontend
+    restart: always
+    ports:
+      - "80:80"
+    networks:
+      - guestbook-network
+
+# Make sure these lines touch the far-left wall (0 spaces)
+networks:
+  guestbook-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local

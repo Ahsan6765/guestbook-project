@@ -1,19 +1,35 @@
 data "azurerm_client_config" "current" {}
 
-resource "azurerm_key_vault" "vault" {
+# resource "azurerm_key_vault" "vault" {
+#   name                = "kv-${var.project}-${var.environment}-${var.name_suffix}"
+#   resource_group_name = var.resource_group_name
+#   location            = var.location
+#   tenant_id           = data.azurerm_client_config.current.tenant_id
+
+#   sku_name = "standard"
+
+#   rbac_authorization_enabled = true
+#   purge_protection_enabled   = true
+#   soft_delete_retention_days = 90
+
+#   public_network_access_enabled = false
+
+#   tags = var.tags
+# }
+
+
+resource "azurerm_key_vault" "main_kv" {
   name                = "kv-${var.project}-${var.environment}-${var.name_suffix}"
   resource_group_name = var.resource_group_name
   location            = var.location
   tenant_id           = data.azurerm_client_config.current.tenant_id
-
-  sku_name = "standard"
+  sku_name            = "standard"
 
   rbac_authorization_enabled = true
   purge_protection_enabled   = true
   soft_delete_retention_days = 90
 
   public_network_access_enabled = false
-
   tags = var.tags
 }
 
@@ -31,6 +47,14 @@ resource "azurerm_private_dns_zone_virtual_network_link" "kv" {
   registration_enabled  = false
   tags                  = var.tags
 }
+
+# resource "azurerm_private_dns_zone_virtual_network_link" "dns_link_kv" {
+#   name                = "link-kv-${var.project}-${var.environment}"
+#   private_dns_zone_id = azurerm_private_dns_zone.dns_zone_kv.id
+#   virtual_network_id  = var.vnet_id
+#   registration_enabled = false
+#   tags                = var.tags
+# }
 
 resource "azurerm_private_endpoint" "kv" {
   name                = "pe-kv-${var.project}-${var.environment}"

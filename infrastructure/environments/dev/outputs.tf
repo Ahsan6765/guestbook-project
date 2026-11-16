@@ -10,10 +10,6 @@ output "aca_subnet_id" {
   value = module.networking.aca_subnet_id
 }
 
-output "pe_subnet_id" {
-  value = module.networking.pe_subnet_id
-}
-
 output "acr_login_server" {
   value = module.container_registry.login_server
 }
@@ -42,8 +38,21 @@ output "container_app_fqdn" {
   value = module.container_app.latest_revision_fqdn
 }
 
+output "container_app_outbound_ip_addresses" {
+  description = "Current Container Apps outbound IPv4 addresses; reconciled by the mysql-firewall environment root."
+  value       = module.container_app.outbound_ip_addresses
+}
+
 output "mysql_fqdn" {
   value = module.mysql.server_fqdn
+}
+
+output "mysql_server_name" {
+  value = module.mysql.server_name
+}
+
+output "subscription_id" {
+  value = var.subscription_id
 }
 
 output "mysql_database_name" {

@@ -27,7 +27,6 @@ module "networking" {
 
   address_space     = var.address_space
   aca_subnet_prefix = var.aca_subnet_prefix
-  pe_subnet_prefix  = var.pe_subnet_prefix
 
   tags = var.tags
 }
@@ -41,10 +40,7 @@ module "network_security" {
   location            = module.resource_group.location
   resource_group_name = module.resource_group.name
 
-  aca_subnet_id     = module.networking.aca_subnet_id
-  aca_subnet_prefix = var.aca_subnet_prefix
-  pe_subnet_id      = module.networking.pe_subnet_id
-  pe_subnet_prefix  = var.pe_subnet_prefix
+  aca_subnet_id = module.networking.aca_subnet_id
 
   tags = var.tags
 }
@@ -83,9 +79,7 @@ module "container_registry" {
   location            = module.resource_group.location
   resource_group_name = module.resource_group.name
 
-  pe_subnet_id = module.networking.pe_subnet_id
-  vnet_id      = module.networking.vnet_id
-  name_suffix  = random_string.unique_suffix.result
+  name_suffix = random_string.unique_suffix.result
 
   tags = var.tags
 }
@@ -99,9 +93,7 @@ module "key_vault" {
   location            = module.resource_group.location
   resource_group_name = module.resource_group.name
 
-  pe_subnet_id = module.networking.pe_subnet_id
-  vnet_id      = module.networking.vnet_id
-  name_suffix  = random_string.unique_suffix.result
+  name_suffix = random_string.unique_suffix.result
 
   tags = var.tags
 }
@@ -122,8 +114,6 @@ module "mysql" {
   location            = module.resource_group.location
   resource_group_name = module.resource_group.name
 
-  pe_subnet_id = module.networking.pe_subnet_id
-  vnet_id      = module.networking.vnet_id
   key_vault_id = module.key_vault.id
   name_suffix  = random_string.unique_suffix.result
 
@@ -182,12 +172,24 @@ module "container_app" {
   max_replicas                         = var.max_replicas
   http_concurrent_requests_per_replica = var.http_concurrent_requests_per_replica
 
-  env_vars = var.env_vars
+  env_vars = merge(var.env_vars, {
+    PORT    = tostring(var.container_port)
+    DB_HOST = module.mysql.server_fqdn
+    DB_PORT = "3306"
+    DB_NAME = module.mysql.database_name
+    DB_SSL  = "true"
+  })
 
   key_vault_secrets = [
     {
-      name                = "sql-${var.environment}-connection-string"
-      key_vault_secret_id = module.mysql.connection_string_secret_versionless_id
+      name                 = "sql-${var.environment}-username"
+      environment_variable = "DB_USER"
+      key_vault_secret_id  = module.mysql.username_secret_versionless_id
+    },
+    {
+      name                 = "sql-${var.environment}-password"
+      environment_variable = "DB_PASSWORD"
+      key_vault_secret_id  = module.mysql.password_secret_versionless_id
     }
   ]
 

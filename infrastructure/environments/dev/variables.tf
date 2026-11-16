@@ -33,11 +33,6 @@ variable "aca_subnet_prefix" {
   default = "10.30.0.0/26"
 }
 
-variable "pe_subnet_prefix" {
-  type    = string
-  default = "10.30.1.0/28"
-}
-
 variable "internal_ingress_only" {
   description = "True makes the environment and ingress private to the VNet"
   type        = bool
@@ -66,7 +61,7 @@ variable "mysql_backup_retention_days" {
 
 variable "mysql_database_name" {
   type    = string
-  default = "appdb"
+  default = "guestbook_db"
 }
 
 variable "container_image" {

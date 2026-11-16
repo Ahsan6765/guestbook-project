@@ -3,9 +3,8 @@ resource "azurerm_container_app_environment" "environment" {
   resource_group_name = var.resource_group_name
   location            = var.location
 
-  log_analytics_workspace_id     = var.log_analytics_workspace_id
-  infrastructure_subnet_id       = var.infrastructure_subnet_id
-  internal_load_balancer_enabled = var.internal_load_balancer_enabled
+  # With no Log Analytics workspace configured, Container Apps streams logs only.
+  infrastructure_subnet_id = var.infrastructure_subnet_id
 
   tags = var.tags
 }

@@ -87,6 +87,23 @@ require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const databaseConfig = {
+  host: process.env.DB_HOST,
+  port: Number(process.env.DB_PORT || 3306),
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  waitForConnections: true,
+  connectionLimit: Number(process.env.DB_CONNECTION_POOL_SIZE || 10),
+  queueLimit: 0,
+  ssl: process.env.DB_SSL === 'true' ? {} : undefined
+};
+
+for (const key of ['host', 'user', 'password', 'database']) {
+  if (!databaseConfig[key]) {
+    throw new Error(`Missing required database configuration: ${key}`);
+  }
+}
 
 app.use(cors());
 app.use(express.json());
@@ -96,15 +113,11 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 // Initialize Asynchronous Database Connection Pool
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
-}).promise();
+const pool = mysql.createPool(databaseConfig).promise();
+
+app.get('/health/live', (req, res) => {
+  res.status(200).json({ status: 'OK' });
+});
 
 // Verification endpoint
 app.get('/health', async (req, res) => {

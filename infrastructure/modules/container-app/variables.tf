@@ -50,11 +50,6 @@ variable "container_memory" {
   default = "1Gi"
 }
 
-variable "ingress_external_enabled" {
-  type    = bool
-  default = true
-}
-
 variable "health_probe_path" {
   type    = string
   default = "/"
@@ -83,8 +78,9 @@ variable "env_vars" {
 variable "key_vault_secrets" {
   description = "Key Vault backed secrets injected as environment variables"
   type = list(object({
-    name                = string
-    key_vault_secret_id = string
+    name                 = string
+    environment_variable = string
+    key_vault_secret_id  = string
   }))
   default = []
 }

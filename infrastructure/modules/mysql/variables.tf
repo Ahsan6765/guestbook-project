@@ -14,14 +14,6 @@ variable "resource_group_name" {
   type = string
 }
 
-variable "pe_subnet_id" {
-  type = string
-}
-
-variable "vnet_id" {
-  type = string
-}
-
 variable "key_vault_id" {
   type = string
 }
@@ -52,7 +44,7 @@ variable "backup_retention_days" {
 
 variable "database_name" {
   type    = string
-  default = "appdb"
+  default = "guestbook_db"
 }
 
 variable "admin_login" {

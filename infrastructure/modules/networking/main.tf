@@ -24,13 +24,3 @@ resource "azurerm_subnet" "aca" {
   }
 }
 
-# Hosts every private endpoint NIC: ACR, Key Vault, MySQL.
-resource "azurerm_subnet" "pe" {
-  name                 = "snet-pe-${var.project}-${var.environment}"
-  resource_group_name  = var.resource_group_name
-  virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = [var.pe_subnet_prefix]
-
-  # Keeps NSG enforcement active on private endpoint NICs.
-  private_endpoint_network_policies = "Enabled"
-}

@@ -22,10 +22,6 @@ variable "aca_subnet_prefix" {
   type = string
 }
 
-variable "pe_subnet_prefix" {
-  type = string
-}
-
 variable "tags" {
   type = map(string)
 }

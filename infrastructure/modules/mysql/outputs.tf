@@ -18,14 +18,14 @@ output "username_secret_id" {
   value = azurerm_key_vault_secret.username.id
 }
 
+output "username_secret_versionless_id" {
+  value = azurerm_key_vault_secret.username.versionless_id
+}
+
 output "password_secret_id" {
   value = azurerm_key_vault_secret.password.id
 }
 
-output "connection_string_secret_id" {
-  value = azurerm_key_vault_secret.connection_string.id
-}
-
-output "connection_string_secret_versionless_id" {
-  value = azurerm_key_vault_secret.connection_string.versionless_id
+output "password_secret_versionless_id" {
+  value = azurerm_key_vault_secret.password.versionless_id
 }

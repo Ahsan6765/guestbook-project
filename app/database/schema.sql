@@ -1,8 +1,5 @@
--- Create the Guestbook Database
-CREATE DATABASE IF NOT EXISTS guestbook_db;
-USE guestbook_db;
-
--- Create the entries table
+-- Terraform provisions the database. This idempotent migration creates the
+-- application table in the database selected by DB_NAME.
 CREATE TABLE IF NOT EXISTS entries (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(100) NOT NULL,

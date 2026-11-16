@@ -26,7 +26,7 @@ resource "azurerm_mysql_flexible_server" "server" {
   backup_retention_days        = var.backup_retention_days
   geo_redundant_backup_enabled = false
 
-  public_network_access = "Disabled"
+  public_network_access = "Enabled"
 
   storage {
     size_gb = var.storage_size_gb
@@ -55,41 +55,6 @@ resource "azurerm_mysql_flexible_server_active_directory_administrator" "app" {
   tenant_id   = data.azurerm_client_config.current.tenant_id
 }
 
-resource "azurerm_private_dns_zone" "mysql" {
-  name                = "privatelink.mysql.database.azure.com"
-  resource_group_name = var.resource_group_name
-  tags                = var.tags
-}
-
-resource "azurerm_private_dns_zone_virtual_network_link" "mysql" {
-  name                  = "link-mysql-${var.project}-${var.environment}"
-  resource_group_name   = var.resource_group_name
-  private_dns_zone_name = azurerm_private_dns_zone.mysql.name
-  virtual_network_id    = var.vnet_id
-  registration_enabled  = false
-  tags                  = var.tags
-}
-
-resource "azurerm_private_endpoint" "mysql" {
-  name                = "pe-mysql-${var.project}-${var.environment}"
-  resource_group_name = var.resource_group_name
-  location            = var.location
-  subnet_id           = var.pe_subnet_id
-  tags                = var.tags
-
-  private_service_connection {
-    name                           = "psc-mysql-${var.project}-${var.environment}"
-    private_connection_resource_id = azurerm_mysql_flexible_server.server.id
-    subresource_names              = ["mysqlServer"]
-    is_manual_connection           = false
-  }
-
-  private_dns_zone_group {
-    name                 = "pdzg-mysql"
-    private_dns_zone_ids = [azurerm_private_dns_zone.mysql.id]
-  }
-}
-
 resource "azurerm_key_vault_secret" "username" {
   name         = "sql-${var.environment}-username"
   value        = var.admin_login
@@ -106,10 +71,3 @@ resource "azurerm_key_vault_secret" "password" {
   tags         = var.tags
 }
 
-resource "azurerm_key_vault_secret" "connection_string" {
-  name         = "sql-${var.environment}-connection-string"
-  value        = "mysql://${urlencode(var.admin_login)}:${urlencode(random_password.admin.result)}@${azurerm_mysql_flexible_server.server.fqdn}:3306/${var.database_name}?ssl=true"
-  key_vault_id = var.key_vault_id
-  content_type = "text/plain"
-  tags         = var.tags
-}

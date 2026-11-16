@@ -9,7 +9,3 @@ output "vnet_name" {
 output "aca_subnet_id" {
   value = azurerm_subnet.aca.id
 }
-
-output "pe_subnet_id" {
-  value = azurerm_subnet.pe.id
-}

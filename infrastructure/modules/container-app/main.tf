@@ -24,7 +24,7 @@ resource "azurerm_container_app" "app" {
   }
 
   ingress {
-    external_enabled           = var.ingress_external_enabled
+    external_enabled           = true
     target_port                = var.container_port
     transport                  = "auto"
     allow_insecure_connections = false
@@ -56,7 +56,7 @@ resource "azurerm_container_app" "app" {
       dynamic "env" {
         for_each = var.key_vault_secrets
         content {
-          name        = upper(replace(env.value.name, "-", "_"))
+          name        = env.value.environment_variable
           secret_name = env.value.name
         }
       }

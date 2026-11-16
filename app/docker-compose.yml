@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # 1. Database service layer
   mysql-db:
@@ -15,6 +13,7 @@ services:
       - "3307:3306"
     volumes:
       - mysql-data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/001_schema.sql:ro
     networks:
       - guestbook-network
     healthcheck:
@@ -26,8 +25,8 @@ services:
   # 2. Backend service layer
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: backend/Dockerfile
     container_name: guestbook-backend
     restart: always
     environment:
@@ -37,6 +36,7 @@ services:
       DB_USER: guestbook_user
       DB_PASSWORD: user_secure_password
       DB_NAME: guestbook_db
+      DB_SSL: "false"
     ports:
       - "5000:5000"
     networks:

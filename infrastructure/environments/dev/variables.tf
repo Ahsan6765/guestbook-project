@@ -33,17 +33,6 @@ variable "aca_subnet_prefix" {
   default = "10.30.0.0/26"
 }
 
-variable "internal_ingress_only" {
-  description = "True makes the environment and ingress private to the VNet"
-  type        = bool
-  default     = false
-}
-
-variable "log_retention_in_days" {
-  type    = number
-  default = 30
-}
-
 variable "mysql_sku_name" {
   type    = string
   default = "B_Standard_B1ms"

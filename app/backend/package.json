@@ -4,7 +4,8 @@
   "description": "Headless JSON API for Guestbook application",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "db:migrate": "node scripts/migrate.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

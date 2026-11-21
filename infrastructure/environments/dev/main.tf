@@ -217,3 +217,18 @@ resource "azurerm_role_assignment" "app_kv_secrets_user" {
   role_definition_name = "Key Vault Secrets User"
   principal_id         = module.managed_identity.principal_id
 }
+
+# 11. Log Analytics (intentionally disabled)
+# This module call is commented out, so Terraform will not create a workspace.
+# To enable centralized logging later, uncomment this block and configure the
+# Container Apps environment to send logs to the workspace.
+# module "log_analytics" {
+#   source = "../../modules/log-analytics"
+#
+#   project             = var.project
+#   environment         = var.environment
+#   location            = module.resource_group.location
+#   resource_group_name = module.resource_group.name
+#
+#   tags = var.tags
+# }

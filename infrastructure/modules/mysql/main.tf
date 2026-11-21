@@ -26,7 +26,7 @@ resource "azurerm_mysql_flexible_server" "server" {
   backup_retention_days        = var.backup_retention_days
   geo_redundant_backup_enabled = false
 
-  public_network_access = "Enabled"
+  public_network_access = var.public_network_access
 
   storage {
     size_gb = var.storage_size_gb

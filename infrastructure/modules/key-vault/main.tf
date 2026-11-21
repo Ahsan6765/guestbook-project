@@ -8,9 +8,9 @@ resource "azurerm_key_vault" "main_kv" {
   sku_name            = "standard"
 
   rbac_authorization_enabled = true
-  purge_protection_enabled   = true
-  soft_delete_retention_days = 90
+  purge_protection_enabled   = var.purge_protection_enabled
+  soft_delete_retention_days = var.soft_delete_retention_days
 
-  public_network_access_enabled = true
+  public_network_access_enabled = var.public_network_access_enabled
   tags                          = var.tags
 }

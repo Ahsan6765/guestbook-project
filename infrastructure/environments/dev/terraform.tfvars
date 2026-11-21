@@ -1,6 +1,5 @@
 # Azure Authentication
-# Replace the placeholder GUID with your actual Subscription ID from the Azure Portal.
-subscription_id = "58458fef-cea7-46aa-930c-cdd9a34ddc44"
+subscription_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 
 # Core Identifiers
 project     = "myapp"
@@ -9,20 +8,22 @@ app_name    = "core-api"
 location    = "eastus"
 
 # Network Architecture
-# A /16 provides ample room for future subnets; the ACA subnet is separate.
 address_space     = ["10.50.0.0/16"]
 aca_subnet_prefix = "10.50.0.0/24"
 
-# Database Configuration (Azure Database for MySQL Flexible Server)
-# B_Standard_B1ms is the most cost-effective burstable SKU for Dev workloads.
+# Test Key Vault Configuration
+key_vault_purge_protection_enabled      = false
+key_vault_soft_delete_retention_days    = 7
+key_vault_public_network_access_enabled = true
+
+# Database Configuration
 mysql_sku_name              = "B_Standard_B1ms"
 mysql_storage_size_gb       = 20
 mysql_backup_retention_days = 2
 mysql_database_name         = "guestbook_db"
+mysql_public_network_access = "Enabled"
 
 # Container App Compute & Image
-# The placeholder image will be replaced by your CI/CD pipeline later.
-# Match the Node.js backend's configured listen port.
 container_image   = "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"
 container_port    = 5000
 container_cpu     = 0.5
@@ -35,7 +36,6 @@ max_replicas                         = 3
 http_concurrent_requests_per_replica = 100
 
 # Application Environment Variables
-# These are injected directly into the container at runtime.
 env_vars = {
   APP_ENV                 = "development"
   LOG_LEVEL               = "debug"

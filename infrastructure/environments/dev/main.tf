@@ -6,16 +6,6 @@ resource "random_string" "unique_suffix" {
   upper   = false
 }
 
-resource "time_sleep" "role_assignment_propagation" {
-  create_duration = "30s"
-
-  depends_on = [
-    azurerm_role_assignment.deployer_kv_secrets_officer,
-    azurerm_role_assignment.app_acr_pull,
-    azurerm_role_assignment.app_kv_secrets_user,
-  ]
-}
-
 # 1. Resource Group
 module "resource_group" {
   source = "../../modules/resource-group"
@@ -81,31 +71,7 @@ module "container_registry" {
   tags = var.tags
 }
 
-# 6. Key Vault
-module "key_vault" {
-  source = "../../modules/key-vault"
-
-  project             = var.project
-  environment         = var.environment
-  location            = module.resource_group.location
-  resource_group_name = module.resource_group.name
-
-  name_suffix                   = random_string.unique_suffix.result
-  purge_protection_enabled      = var.key_vault_purge_protection_enabled
-  soft_delete_retention_days    = var.key_vault_soft_delete_retention_days
-  public_network_access_enabled = var.key_vault_public_network_access_enabled
-
-  tags = var.tags
-}
-
-# The deploying identity needs permission to write the initial MySQL secrets to Key Vault
-resource "azurerm_role_assignment" "deployer_kv_secrets_officer" {
-  scope                = module.key_vault.id
-  role_definition_name = "Key Vault Secrets Officer"
-  principal_id         = data.azurerm_client_config.current.object_id
-}
-
-# 7. MySQL Database
+# 6. MySQL Database
 module "mysql" {
   source = "../../modules/mysql"
 
@@ -114,8 +80,7 @@ module "mysql" {
   location            = module.resource_group.location
   resource_group_name = module.resource_group.name
 
-  key_vault_id = module.key_vault.id
-  name_suffix  = random_string.unique_suffix.result
+  name_suffix = random_string.unique_suffix.result
 
   sku_name              = var.mysql_sku_name
   storage_size_gb       = var.mysql_storage_size_gb
@@ -128,14 +93,9 @@ module "mysql" {
   app_identity_object_id = module.managed_identity.principal_id
 
   tags = var.tags
-
-  depends_on = [
-    azurerm_role_assignment.deployer_kv_secrets_officer,
-    time_sleep.role_assignment_propagation,
-  ]
 }
 
-# 8. Container Apps Environment
+# 7. Container Apps Environment
 module "container_apps_environment" {
   source = "../../modules/container-apps-environment"
 
@@ -151,7 +111,7 @@ module "container_apps_environment" {
   depends_on = [module.network_security]
 }
 
-# 9. Container App
+# 8. Container App
 module "container_app" {
   source = "../../modules/container-app"
 
@@ -183,52 +143,40 @@ module "container_app" {
     DB_SSL  = "true"
   })
 
-  key_vault_secrets = [
-    {
-      name                 = "sql-${var.environment}-username"
-      environment_variable = "DB_USER"
-      key_vault_secret_id  = module.mysql.username_secret_versionless_id
-    },
-    {
-      name                 = "sql-${var.environment}-password"
-      environment_variable = "DB_PASSWORD"
-      key_vault_secret_id  = module.mysql.password_secret_versionless_id
-    }
-  ]
+  # Terraform-generated values are wired as Container Apps secrets, not literals in source.
+  secret_names = ["db-username", "db-password"]
+  secrets = {
+    "db-username" = module.mysql.admin_username
+    "db-password" = module.mysql.admin_password
+  }
+  secret_env_vars = {
+    DB_USER     = "db-username"
+    DB_PASSWORD = "db-password"
+  }
 
   tags = var.tags
 
   depends_on = [
     azurerm_role_assignment.app_acr_pull,
-    azurerm_role_assignment.app_kv_secrets_user,
     time_sleep.role_assignment_propagation,
   ]
 }
 
-# 10. Role Assignments for the Application Identity
+# 9. Role Assignments for the Application Identity
 resource "azurerm_role_assignment" "app_acr_pull" {
   scope                = module.container_registry.id
   role_definition_name = "AcrPull"
   principal_id         = module.managed_identity.principal_id
 }
 
-resource "azurerm_role_assignment" "app_kv_secrets_user" {
-  scope                = module.key_vault.id
-  role_definition_name = "Key Vault Secrets User"
-  principal_id         = module.managed_identity.principal_id
+resource "time_sleep" "role_assignment_propagation" {
+  create_duration = "30s"
+
+  depends_on = [azurerm_role_assignment.app_acr_pull]
 }
 
-# 11. Log Analytics (intentionally disabled)
-# This module call is commented out, so Terraform will not create a workspace.
-# To enable centralized logging later, uncomment this block and configure the
-# Container Apps environment to send logs to the workspace.
+# Log Analytics remains intentionally disabled for this provisioning phase.
 # module "log_analytics" {
 #   source = "../../modules/log-analytics"
-#
-#   project             = var.project
-#   environment         = var.environment
-#   location            = module.resource_group.location
-#   resource_group_name = module.resource_group.name
-#
-#   tags = var.tags
+#   ...
 # }

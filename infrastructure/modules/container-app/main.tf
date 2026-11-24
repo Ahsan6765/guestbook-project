@@ -15,11 +15,10 @@ resource "azurerm_container_app" "app" {
   }
 
   dynamic "secret" {
-    for_each = var.key_vault_secrets
+    for_each = var.secret_names
     content {
-      name                = secret.value.name
-      identity            = var.identity_id
-      key_vault_secret_id = secret.value.key_vault_secret_id
+      name  = secret.value
+      value = var.secrets[secret.value]
     }
   }
 
@@ -54,10 +53,10 @@ resource "azurerm_container_app" "app" {
       }
 
       dynamic "env" {
-        for_each = var.key_vault_secrets
+        for_each = var.secret_env_vars
         content {
-          name        = env.value.environment_variable
-          secret_name = env.value.name
+          name        = env.key
+          secret_name = env.value
         }
       }
 

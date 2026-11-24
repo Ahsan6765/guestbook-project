@@ -1,4 +1,5 @@
 # Azure Authentication
+# Supply the real target subscription ID in a local, untracked tfvars file.
 subscription_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 
 # Core Identifiers
@@ -10,11 +11,6 @@ location    = "eastus"
 # Network Architecture
 address_space     = ["10.50.0.0/16"]
 aca_subnet_prefix = "10.50.0.0/24"
-
-# Test Key Vault Configuration
-key_vault_purge_protection_enabled      = false
-key_vault_soft_delete_retention_days    = 7
-key_vault_public_network_access_enabled = true
 
 # Database Configuration
 mysql_sku_name              = "B_Standard_B1ms"

@@ -14,10 +14,6 @@ variable "resource_group_name" {
   type = string
 }
 
-variable "key_vault_id" {
-  type = string
-}
-
 variable "name_suffix" {
   type = string
 }

@@ -14,10 +14,6 @@ output "acr_login_server" {
   value = module.container_registry.login_server
 }
 
-output "key_vault_uri" {
-  value = module.key_vault.uri
-}
-
 output "app_identity_client_id" {
   value = module.managed_identity.client_id
 }

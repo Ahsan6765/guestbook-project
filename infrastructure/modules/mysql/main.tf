@@ -55,19 +55,3 @@ resource "azurerm_mysql_flexible_server_active_directory_administrator" "app" {
   tenant_id   = data.azurerm_client_config.current.tenant_id
 }
 
-resource "azurerm_key_vault_secret" "username" {
-  name         = "sql-${var.environment}-username"
-  value        = var.admin_login
-  key_vault_id = var.key_vault_id
-  content_type = "text/plain"
-  tags         = var.tags
-}
-
-resource "azurerm_key_vault_secret" "password" {
-  name         = "sql-${var.environment}-password"
-  value        = random_password.admin.result
-  key_vault_id = var.key_vault_id
-  content_type = "text/plain"
-  tags         = var.tags
-}
-

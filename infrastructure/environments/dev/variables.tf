@@ -48,29 +48,6 @@ variable "aca_subnet_prefix" {
   }
 }
 
-variable "key_vault_purge_protection_enabled" {
-  description = "Enable purge protection; recommended for production"
-  type        = bool
-  default     = false
-}
-
-variable "key_vault_soft_delete_retention_days" {
-  description = "Key Vault soft-delete retention in days"
-  type        = number
-  default     = 7
-
-  validation {
-    condition     = var.key_vault_soft_delete_retention_days >= 7 && var.key_vault_soft_delete_retention_days <= 90
-    error_message = "Key Vault soft-delete retention must be between 7 and 90 days."
-  }
-}
-
-variable "key_vault_public_network_access_enabled" {
-  description = "Enable the Key Vault public endpoint"
-  type        = bool
-  default     = true
-}
-
 variable "mysql_sku_name" {
   type    = string
   default = "B_Standard_B1ms"

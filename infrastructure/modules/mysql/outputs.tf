@@ -14,18 +14,11 @@ output "database_name" {
   value = azurerm_mysql_flexible_database.app.name
 }
 
-output "username_secret_id" {
-  value = azurerm_key_vault_secret.username.id
+output "admin_username" {
+  value = var.admin_login
 }
 
-output "username_secret_versionless_id" {
-  value = azurerm_key_vault_secret.username.versionless_id
-}
-
-output "password_secret_id" {
-  value = azurerm_key_vault_secret.password.id
-}
-
-output "password_secret_versionless_id" {
-  value = azurerm_key_vault_secret.password.versionless_id
+output "admin_password" {
+  value     = random_password.admin.result
+  sensitive = true
 }

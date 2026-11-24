@@ -75,14 +75,23 @@ variable "env_vars" {
   default = {}
 }
 
-variable "key_vault_secrets" {
-  description = "Key Vault backed secrets injected as environment variables"
-  type = list(object({
-    name                 = string
-    environment_variable = string
-    key_vault_secret_id  = string
-  }))
+variable "secret_names" {
+  description = "Non-sensitive names of secrets configured directly on the Container App"
+  type        = set(string)
   default = []
+}
+
+variable "secrets" {
+  description = "Secret values configured directly on the Container App; Terraform state contains these values"
+  type        = map(string)
+  sensitive   = true
+  default     = {}
+}
+
+variable "secret_env_vars" {
+  description = "Environment variable names mapped to Container App secret names"
+  type        = map(string)
+  default     = {}
 }
 
 variable "tags" {
